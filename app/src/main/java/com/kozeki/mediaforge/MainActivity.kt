@@ -19,6 +19,7 @@ import coil.load
 import coil.decode.VideoFrameDecoder
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.ReturnCode
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kozeki.mediaforge.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -230,16 +231,17 @@ class MainActivity : AppCompatActivity() {
         val vf = when {
             isAvatar -> "crop=min(iw\\,ih):min(iw\\,ih),scale=400:400:flags=lanczos,fps=30"
             isBackground -> "crop=min(iw\\,ih*9/16):min(ih\\,iw*16/9),scale=720:1280:flags=lanczos,fps=30"
-            isWebpOriginal -> "scale='min(1080,iw)':-2:flags=lanczos,scale=trunc(iw/2)*2:trunc(ih/2)*2,fps=30"
+            isWebpOriginal -> "scale=min(1080\\,trunc(iw/2)*2):-2:flags=lanczos,fps=30"
             isGif -> "crop=min(iw\\,ih):min(iw\\,ih),scale=360:360:flags=lanczos,fps=24,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5"
             isMp4 -> "scale=-2:720,fps=30"
-            else -> "scale='min(1080,iw)':-2:flags=lanczos,scale=trunc(iw/2)*2:trunc(ih/2)*2,fps=30"
+            else -> "scale=min(1080\\,trunc(iw/2)*2):-2:flags=lanczos,fps=30"
         }
 
         cmdList.add("-vf")
         cmdList.add(vf)
 
         if (format == "webp") {
+            cmdList.add("-an")
             cmdList.add("-vcodec")
             cmdList.add("libwebp")
             cmdList.add("-lossless")
@@ -251,6 +253,7 @@ class MainActivity : AppCompatActivity() {
             cmdList.add("-loop")
             cmdList.add("0")
         } else if (format == "gif") {
+            cmdList.add("-an")
             cmdList.add("-loop")
             cmdList.add("0")
         } else if (format == "mp4") {
@@ -272,10 +275,10 @@ class MainActivity : AppCompatActivity() {
 
         cmdList.add(outputFile.absolutePath)
 
-        val cmdStr = cmdList.toTypedArray().joinToString(" ") { if (it.contains(" ") || it.contains(";")) "\"$it\"" else it }
         val startTime = System.currentTimeMillis()
+        android.util.Log.d("MediaForge", "Executing args: " + cmdList.joinToString(" "))
 
-        FFmpegKit.executeAsync(cmdStr) { session ->
+        FFmpegKit.executeWithArgumentsAsync(cmdList.toTypedArray()) { session ->
             val returnCode = session.returnCode
             val elapsed = (System.currentTimeMillis() - startTime) / 1000f
 
@@ -289,8 +292,16 @@ class MainActivity : AppCompatActivity() {
                     binding.cardResult.visibility = View.VISIBLE
                     Toast.makeText(this, "Success! Ready to save to gallery.", Toast.LENGTH_SHORT).show()
                 } else {
-                    val failLog = session.failStackTrace ?: "Unknown error"
-                    Toast.makeText(this, "Conversion failed: $failLog", Toast.LENGTH_LONG).show()
+                    val logs = session.allLogsAsString ?: ""
+                    android.util.Log.e("MediaForge", "FFmpeg failure log:\n$logs")
+                    val failLog = session.failStackTrace ?: logs.lines().filter { it.isNotBlank() }.takeLast(6).joinToString("\n").ifBlank { "Exit code: ${returnCode?.value}" }
+                    
+                    binding.txtProgressStatus.text = "Failed"
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Conversion Failed")
+                        .setMessage(failLog)
+                        .setPositiveButton("OK", null)
+                        .show()
                 }
             }
         }
