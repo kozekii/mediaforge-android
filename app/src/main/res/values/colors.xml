@@ -1,0 +1,12 @@
+<resources>
+    <color name="bg_base">#080C14</color>
+    <color name="bg_surface">#0F172A</color>
+    <color name="bg_surface_elevated">#1E293B</color>
+    <color name="primary">#38BDF8</color>
+    <color name="primary_variant">#818CF8</color>
+    <color name="accent">#C084FC</color>
+    <color name="success">#34D399</color>
+    <color name="text_main">#F8FAFC</color>
+    <color name="text_muted">#94A3B8</color>
+    <color name="border_subtle">#1AFFFFFF</color>
+</resources>
