@@ -257,6 +257,13 @@
                     android:text="🌌 Chat Background (WebP 9:16)" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chipWebpOriginal"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🌀 Full WebP (No Crop / Original)" />
+
+                <com.google.android.material.chip.Chip
                     android:id="@+id/chipGif"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"

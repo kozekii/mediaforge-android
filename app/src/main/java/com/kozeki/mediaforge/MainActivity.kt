@@ -200,6 +200,7 @@ class MainActivity : AppCompatActivity() {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val isAvatar = binding.chipAvatar.isChecked
         val isBackground = binding.chipBackground.isChecked
+        val isWebpOriginal = binding.chipWebpOriginal.isChecked
         val isGif = binding.chipGif.isChecked
         val isMp4 = binding.chipMp4.isChecked
 
@@ -229,9 +230,10 @@ class MainActivity : AppCompatActivity() {
         val vf = when {
             isAvatar -> "crop=min(iw\\,ih):min(iw\\,ih),scale=400:400:flags=lanczos,fps=30"
             isBackground -> "crop=min(iw\\,ih*9/16):min(ih\\,iw*16/9),scale=720:1280:flags=lanczos,fps=30"
+            isWebpOriginal -> "scale='min(1080,iw)':-2:flags=lanczos,scale=trunc(iw/2)*2:trunc(ih/2)*2,fps=30"
             isGif -> "crop=min(iw\\,ih):min(iw\\,ih),scale=360:360:flags=lanczos,fps=24,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5"
             isMp4 -> "scale=-2:720,fps=30"
-            else -> "scale=-2:720"
+            else -> "scale='min(1080,iw)':-2:flags=lanczos,scale=trunc(iw/2)*2:trunc(ih/2)*2,fps=30"
         }
 
         cmdList.add("-vf")
