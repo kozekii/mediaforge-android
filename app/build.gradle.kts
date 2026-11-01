@@ -60,9 +60,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.activity:activity-ktx:1.8.2")
 
-    // FFmpeg Kit
+    // FFmpeg Kit (includes smart-exception)
     implementation("com.mrljdx:ffmpeg-kit-full:6.1.4")
-    implementation("com.arthenica:smart-exception-java:0.2.1")
 
     // Coil Image & Video Thumbnail Loader
     implementation("io.coil-kt:coil:2.5.0")
